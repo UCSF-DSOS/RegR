@@ -1,0 +1,176 @@
+---
+title: "Logistic regression for binary outcomes"
+editor_options: 
+  chunk_output_type: inline
+---
+
+First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
+
+```{r messages=FALSE}
+library(dplyr)
+library(ggplot2)
+library(lmtest)
+library(naniar)
+library(jtools)
+```
+
+*Note: this notebook also assumes that you have assigned the `projdir` object (main project directory) and that you have an object called `hrs` that contains the data. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
+
+#### Preliminary data checks
+
+Say we want to study the relationship between having been diagnosed with high blood pressure (`bp_dx`) and having been diagnosed with depression (`depress_dx`). We could use a chi-square test to get a p-value for this comparison.
+
+```{r}
+?chisq.test
+```
+
+Since a two-way table is what it wants as input, it would be cleaner to assign this table as an object first.
+
+```{r}
+tab_dep_bp <- table("High BP"=hrs$bp_dx, "Depression"=hrs$depress_dx)
+tab_dep_bp
+chisq.test(tab_dep_bp)
+```
+
+So we see that these are associated at p\<0.01. But how else can we describe this? With an odds ratio (OR).
+
+An unadjusted OR can be calculated from this table alone. Of course there are functions to help you do this but just so we are clear on what the OR is, we can do this manually. Let's say we want the odds of depression for those with high BP vs. those without high BP.
+
+```{r}
+odds_hibp <- 381/1316 
+odds_lobp <- 98/583
+or_bp <- odds_hibp / odds_lobp
+or_bp
+```
+
+So those with a high BP diagnosis have a greater odds of having had a depression diagnosis (OR=1.72).
+
+Remember that odds != risks and odds ratios != risk ratios (if the outcome is rare then they will be close). How would we calculate the risk ratio instead?
+
+```{r}
+risk_hibp <- 381/(381+1316)
+risk_lobp <- 98/(98+583)
+rr_bp <- risk_hibp / risk_lobp
+rr_bp
+```
+
+So the risk of depression is also higher in those with a high BP but these are not exactly the same.
+
+### Simple logistic regression
+
+As mentioned in the previous section, we can use `glm()` for many different types of regression models. Here, since we want logistic regression because we have a binary outcome, we will use the Binomial family (specified using the family=binomial option).
+
+Let's use this to test if there is an association between high blood pressure and depression diagnoses. Just like with linear regression, we'll assign this model to an object so we can easily access all of the values, like coefficients and 95% confidence intervals.
+
+```{r}
+depfit <- glm(depress_dx ~ bp_dx, data=hrs, family=binomial) 
+depfit 
+summary(depfit) 
+confint(depfit)
+```
+
+For logistic regression, we usually present **odds ratios (OR)**, which are the exponents of the coefficients. The interpretation of odds ratios is not covered here, but there are many resources online if you need a reminder. We can use the `exp()` function to get OR and 95% confidence intervals from the model above.
+
+```{r}
+exp(coefficients(depfit))
+exp(confint(depfit))
+```
+
+So the OR is consisent with what we calculated manually above, and the p-value is pretty consistent with the chi-square test too.
+
+### Multivariable logistic regression
+
+Let's see what happens to the relationship between high blood pressure and depression if we adjust for female and age. Again, to add more factors to the right side of the model we just use the `+` sign between them.
+
+```{r}
+depfit_adj1 <- glm(depress_dx ~ bp_dx + female + age_2014, data=hrs, family=binomial) 
+summary(depfit_adj1)
+```
+
+*Do you remember how to get the ORs for the coefficients?*
+
+```{r}
+exp(coefficients(depfit_adj1))
+```
+
+So we see that high BP diagnosis is even stronger predictor of depression diagnosis after adjusting for these variables (adjusted OR=1.91 vs. unadjusted OR=1.72), and the p-value is smaller too. We also see that female and age are independently associated themselves (higher odds of depression diagnosis for females, lower odds of depression diagnosis for older folks).
+
+**Likelihood ratio test to compare nested models**
+
+*Do you remember how to do this from the liner regression model?*
+
+Remember first that you need to make sure the datasets used for each model are the same size, so in this case we will rerun the unadjusted model `depfit` using the data in the adjusted model `depfit_adj1`.
+
+```{r}
+depfit <- glm(depress_dx ~ bp_dx, data=depfit_adj1$model, family=binomial)
+lrtest(depfit, depfit_adj1)
+```
+
+So like with the linear regression, we see that these demographic variables collectively improve the model fit. They should be kept in the model.
+
+**Imputing missing values**
+
+Let's see what happens when we adjust for the polygenetic score for depression. First let's summarize this continuous variable.
+
+```{r}
+summary(hrs$polygen_dep)
+```
+
+So there are a lot missing. If we wanted to, we could do a simple imputation (replacement of the missing) by assigning the mean value of the non-missing values. But
+
+The `naniar` package has some great tools for visualizing and imputing missing values. Let's start by using one of the visualization plot functions. See the package [vignette](https://cran.r-project.org/web/packages/naniar/vignettes/getting-started-w-naniar.html) for more ideas!
+
+We will just select the variables that we wantto enter into the next model.
+
+```{r}
+vis_miss(hrs[, c("depress_dx","bp_dx","female","age_2014","polygen_dep")])
+```
+
+If we run a model with all those missing in the polygenetic marker score, only those observations with complete data will be used. Let's run the model without the imputed values so we can campare it to the one with the imputed values.
+
+```{r}
+depfit_gen <- glm(depress_dx ~ bp_dx + female + age_2014 + polygen_dep, data=hrs,
+family=binomial)
+```
+
+There are lots of different ways to do imputations. For a review of some methods, see another vignette from the authors of `naniar` [here](http://naniar.njtierney.com/articles/exploring-imputed-values.html).
+
+We are just going to do a simple imputation using the mean of the non-missing values. This is not necessarily what is usually recommended, but just to show how this is working we will look at how these functions work.
+
+```{r}
+head(hrs$polygen_dep)
+mean(hrs$polygen_dep, na.rm=TRUE)
+impute_mean(hrs$polygen_dep) %>% head()
+```
+
+Now let's create a new variable `polygen_dep_imp` that contains the mean-imputed missing values.
+
+```{r}
+hrs$polygen_dep_imp <- impute_mean(hrs$polygen_dep)
+summary(hrs$polygen_dep_imp)
+```
+
+Finally, we can now run the model with imputed values.
+
+```{r}
+depfit_gen_imp <- glm(depress_dx ~ bp_dx + female + age_2014 + polygen_dep_imp, data=hrs,
+family=binomial)
+```
+
+And we will see what the impact is by looking at the two models.
+
+```{r}
+summary(depfit_gen)
+summary(depfit_gen_imp)
+```
+
+**Visualize non-imputed vs. imputed**
+
+*Do you remember how to plot the coefficients using the `jtools` package?*
+
+Let's visualize the differences between the model without imputed values (Model 1) vs. with imputed values (Model 2).
+
+```{r message=FALSE}
+plot_summs(depfit_gen, depfit_gen_imp, scale=TRUE)
+```
+

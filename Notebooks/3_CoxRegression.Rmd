@@ -1,0 +1,103 @@
+---
+title: "Cox regression for survival outcomes"
+editor_options: 
+  chunk_output_type: inline
+---
+
+First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
+
+```{r messages=FALSE}
+library(dplyr)
+library(ggplot2)
+library(survival)
+library(gplots)
+library(survminer)
+library(jtools)
+```
+
+*Note: this notebook also assumes that you have assigned the `projdir` object (main project directory) and that you have an object called `hrs` that contains the data. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
+
+#### Preliminary data checks
+
+**Kaplan-Meier curves**
+
+First, let's look at Kaplan-Meier curves to compare survival time from 2014 to 2018. First, we have to generate the data that goes into the curve. For each time interval (in our case months), we need to know the number alive at the beginning, the number who died by the end, and the proportion that died (or were censored/lost to follow-up) during each interval.
+
+Kaplan-Meier curves are used to describe survival data by categorical variables. It is a good way to test whether the proportional hazards assumption required for Cox regression will be met for your key categorical predictors. Let's do this for the `female` variable which we will use in Cox regression below.
+
+```{r}
+sfit <- survfit(Surv(mos_to_death, died) ~ female, data = hrs)
+sfit
+```
+
+Those identifying as female in this cohort had a longer median survival time.
+
+The `survminer` package allows us to use ggplot2 to plot nice Kaplan-Meier curves based on the data from the `survfit()` function. You can specify axis titles and other options as you do with ggplot2.
+
+```{r message=FALSE}
+ggsurvplot(sfit) +
+    labs(x="Months")
+```
+
+The lines are separated which is good (if there was a lot of crossing over, then proportional hazard assumption might be violated - more on this below).
+
+**Log rank tests**
+
+If we want to test for significant differences in survival times by a catagorical variable, log rank tests are a good way to go. These are non-parametric tests that often accompany the Kaplan-Meier curves. The syntax is the same as above except we use the `survdiff()` function instead of `survfit()`. The default `survdiff()` is to perform a log rank test.
+
+```{r}
+sdiff <- survdiff(Surv(mos_to_death, died) ~ female, data = hrs)
+sdiff
+```
+
+So the p-value is \<0.01, indicating that females have a significantly longer survival time (because we saw that they have a longer median time above, and the curve shows this too).
+
+### Cox proportional hazards regression
+
+Now let's run a Cox regression model to test if survival is different by gender. The Cox regression model is the most common method used for multivariable survival analysis.
+
+First we will run a model with gender as the only predictor of survival (and hopefully this p-value will be similar to the log rank test above).
+
+```{r}
+cfit1 <- coxph(Surv(mos_to_death, died) ~ female, data =  hrs)
+cfit1
+```
+
+Again we see a significant effect for female. The **exp(coef)** value is the **Hazard Ratio (HR)**. Since the HR is \<1, this means that females have a lower risk of dying than non-females.
+
+Let's see what happens when we adjust for age, bp_dx, and depress_dx. Like with linear and logistic regression, we can just add variables on the right side separated by `+`.
+
+```{r}
+cfit2 <- coxph(Surv(mos_to_death, died) ~ female + age_2014 + bp_dx + depress_dx, data =  hrs)
+cfit2
+```
+
+So everything except `bp_dx` is significantly associated with survival times. Notice that the HR for female is now \>1 (it was \<1 before adjusting)!
+
+```{r}
+exp(coefficients(cfit1))
+exp(coefficients(cfit2))
+```
+
+**Model diagnostics**
+
+Just like with any other type of regression, you should check to see if the assumptions of this model are met. For the Cox model, one of the most important assumptions to test is proportional hazards, meaning that the HRs are assumed to be constant over time.
+
+In the following test for the proportional hazards assumption, we are looking for non-significant results, because *significance indicates a violation* of the assumption of constant HRs over time.
+
+```{r}
+cfit_ph <- cox.zph(cfit2)
+cfit_ph
+```
+
+If we are using a p\<0.05 criteria, age is in violation. There are ways to deal with this (beyond the scope of this workshop). The global p-value is not significant however, meaning that the model meets the assumption overall. If gender was our main interest then it's probably OK.
+
+For more diagnostic tests and options when proportional hazards assumtpions are not met, this [tutorial](https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html) has more details.
+
+**Visualize model results**
+
+*Last but not least, do you still remember how to plot the coefficients using the `jtools` package? It works for most types of models!*
+
+```{r message=FALSE}
+plot_summs(cfit2, scale=TRUE)
+```

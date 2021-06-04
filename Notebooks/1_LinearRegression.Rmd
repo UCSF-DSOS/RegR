@@ -1,0 +1,175 @@
+---
+title: "Linear regression for continuous outcomes"
+editor_options: 
+  chunk_output_type: inline
+---
+
+First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(lmtest)
+library(jtools)
+```
+
+*Note: this notebook also assumes that you have assigned the `projdir` object (main project directory) and that you have an object called `hrs` that contains the data. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
+
+### Generalized linear models
+
+These can be used to fit many different kinds of regression models in R. One of the key features that controls which kind of model is run is specified by the family parameter in the `glm()` function. The default (if family is not specified) is to use the Gaussian family. We will use this for linear regression with a continuous outcome, and we will switch to using the Binomial family for logistic regression in the next section. The rest will not be covered in this course.
+
+```{r}
+?glm
+```
+
+Notice the syntax uses the formula style of input: `y ~ x`. And the default is to assume that y is continuous. Also, we can refer to variables directly (rather than with the \$) and specify the data argument.
+
+#### Preliminary data checks
+
+One of the assumptions of linear regression is that your outcome (y variable) is continuous and normally distributed. There are several ways to test this assumption. We will use the visual method of using `ggplot2` to create a Q-Q plot on the variable we intend to model as the outcome, systolic blood pressure `bp_sys`.
+
+The `ggplot2` package is a very powerful package for creating publication-quality graphics. We won't cover it fully in this course (stay tuned for a separate workshop on R visualizations!). Here is a great resource for inspiration and concise code tips: [ggplot2 cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf).
+
+Take a look at the first example of a `ggplot()` call under Basics section of the cheatsheet:\
+ggplot(data = mpg, aes(x = cty, y = hwy))
+
+At minimum, for ggplot functions, we need to specify:
+
+-   The data (here `hrs`)
+-   The variables to plot (with the `aes()` function, here `bp_sys`)
+-   The type of plot or geometry (here with the `geom_histogram()` function)
+
+**Distribution plots**
+
+Histogram of `bp_sys`
+
+```{r}
+ggplot(data=hrs, aes(x=bp_sys)) + 
+  geom_histogram(col="red",
+                 fill="yellow") + 
+  labs(x="Systolic (mmHg)") 
+```
+
+Q-Q plot of `bp_sys`
+
+```{r}
+ggplot(data=hrs, aes(sample=bp_sys)) +
+  stat_qq() + 
+  stat_qq_line(color="red") +  
+  labs(y="Systolic BP")
+```
+
+Notice that we used the argument *sample* in the `aes()` function. This is what the Q-Q plot functions are looking for (not *x* or *y*).
+
+In the ideal situation (a perfectly normally-distributed variable), is that all of the actual values (black dots) follow the theoretical normal distribution (red line).
+
+**Bivariable plots**
+
+Another handy plot to use for visualizing the relationship between two key variables (e.g. your continuous outcome and the key predictor you want to use, in this case diastolic blood pressure `bp_dia`) is the scatterplot.
+
+Scatterplots can also help spot outliers and impossible values (for example where bp_dia is less than bp_sys).
+
+```{r}
+ggplot(hrs, aes(x=bp_dia, y=bp_sys)) + 
+  geom_point() + 
+  geom_abline(color="red") +
+  theme_bw()
+```
+
+If we wanted to remove some of the values, you can do this easily using functions from the `dplyr` or `naniar` packages. For now we will leave thins as is.
+
+#### Simple linear regression
+
+Let's test for the association between systolic and diastolic blood pressure (BP).
+
+```{r}
+glm(bp_sys ~ bp_dia, data=hrs)
+```
+
+There are also functions that can be applied to the model object to easily extract confidence intervals for the coefficients, fitted values, residuals, and other information. Let's look at an overall model summary and get coefficient confidence intervals.
+
+```{r}
+bpfit <- glm(bp_sys ~ bp_dia, data=hrs)
+summary(bpfit) 
+```
+
+And now for the confidence intervals for the coefficients.
+
+```{r}
+confint(bpfit)
+```
+
+**Visualizing the regression line on a scatterplot**
+
+```{r}
+ggplot(hrs, aes(x=bp_dia, y=bp_sys)) + 
+  geom_point() + 
+  geom_smooth(method ="lm") +
+  theme_bw()
+```
+
+The solid blue line represents the regression line (slope/coefficient), and the gray band around it is by default the 95% confidence interval around the line. Of course there are many ways to customize this (add labels with `labs`, overlay the actual regression formula as text with `annotate`, etc.
+
+#### Multivariable linear regression
+
+Now let's say we want to add some other predictors to adjust for possible confounding or to study the independent associations of multiple variables with the outcome. For now, let's add `female` and `age_2014`. To do this, you just add a `+` between the predictors in the right-hand side of the \~.
+
+```{r}
+bpfit_adj <- glm(bp_sys ~ bp_dia + female + age_2014, data=hrs)
+summary(bpfit_adj) 
+```
+
+So we conclude that diastolic BP is independently associated with systolic BP after adjusting for female and age.
+
+**Likelihood ratio test to compare nested models**
+
+Say we wanted to compare the unadjusted model to the adjusted model with all of the extra covariates we added. As long as the models are "nested", in other words the predictors in one model are a subset of predictors in another model, this test is valid. It can be used for other types of models as well.
+
+The catch is that both models must contain the same amount of observations, and we have some missing values in the female and age variables. So we can avoid an error by re-running the unadjusted model with the data used to fit the adjusted model.
+
+```{r}
+bpfit <- glm(bp_sys ~ bp_dia, data=bpfit_adj$model)
+lrtest(bpfit, bpfit_adj)
+```
+
+We conclude that the second model with female and age fits the data better than the first model without these (p\<0.01).
+
+**Model diagnostics**
+
+A commonly used diagnostic check to determine if the model fits the data well is to look at the fitted values and residuals. The mean of the fitted values should be similar to the actual values, and the mean of the residuals should be around zero.
+
+For now we will just use the original model from above called `bpfit` (with `bp_dia` as the only predictor). The same can be done for the adjusted model.
+
+```{r}
+summary(hrs$bp_sys)  ## the actual systolic BP
+
+summary(fitted(bpfit))  ## the predicted systolic BP 
+summary(residuals(bpfit)) ## difference between predicted and actual systolic BP
+```
+
+The fitted values and the residuals should **not** be correlated. One way to find out (by eyeball) is to do a scatterplot.
+
+```{r}
+ggplot(bpfit, aes(fitted(bpfit), residuals(bpfit))) + 
+  geom_point() + 
+  geom_hline(yintercept=0, color="green") 
+```
+
+You can get a Pearson's correlation coefficient between fitted values and residuals. This correlation should be near zero and the p-value non-significant.
+
+```{r}
+cor.test(x=fitted(bpfit), y=residuals(bpfit), method="pearson") 
+```
+
+Overall this model fits well.
+
+**Coefficient plots**
+
+There are many situations where you have a large multivariable model and a visualization is a better way to summarize the effects. This isn't necessarily one of those cases, but to demonstrate how to do this with a function from the `jtools` package, we'll make a simple plot of the coefficients and 95% confidence intervals.
+
+For more handy tools from `jtools`, see this [vignette](https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#plot_summs_and_plot_coefs)!
+
+```{r message=FALSE}
+plot_summs(bpfit_adj, scale=TRUE) ## scale mean-centers the predictor values so they are less affected by original scale
+```

@@ -1,0 +1,51 @@
+---
+title: "Setup: Create an RStudio project and read data"
+editor_options: 
+  chunk_output_type: inline
+---
+
+### Install and Load Required Packages
+
+Next, install and load the packages that we will be using in all sections.
+
+```{r}
+pkgs <- c("dplyr","ggplot2","jtools","lmtest","naniar","survival","gplots","survminer")
+
+install.packages(pkgs, update = TRUE, ask = FALSE) 
+
+for(package in pkgs) {
+  do.call("library", list(package))
+}
+```
+
+*Note: this will update packages if they already exist in your system. If asked to restart RStudio, you can do this - just make sure you save things if you have other stuff open.*
+
+### Read data into R
+
+***HRS variables***
+
+```{r}
+Variable <- c("id", "female", "age_2014", "depress_dx", "bp_dx", "bp_rx", "bp_sys", "bp_dia",
+              "polygen_map", "polygen_dep", "died", "mos_to_death")
+Label <- c("unique patient identifiers (random)", "female (self-reported)", "age in 2014", "depression diagnosis (ever, self-reported)", "high blood pressure diagnosis (ever, self-reported)", "high blood pressure meds (current, self-reported)", "systolic blood pressure (measured)", "diastolic blood pressure (measured)", 
+           "polygenic marker score ~ mean arterial pressure", "polygenic marker score ~ depression",
+           "died (or censored)", "months to death (or censoring)")
+
+hrsvars <- as.data.frame(cbind(Variable, Label))
+
+hrsvars
+```
+
+We will first read the file called "hrs_analyze.csv" into R (calling this object simply `hrs`).
+
+```{r}
+hrs <- read.csv("../Data/hrs_analyze.csv")
+hrs
+```
+
+### Inspect the data
+
+```{r}
+str(hrs) ## remember str stands for "structure" in R
+head(hrs) 
+```
