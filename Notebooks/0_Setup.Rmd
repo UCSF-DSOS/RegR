@@ -1,7 +1,9 @@
 ---
-title: "Setup: Create an RStudio project and read data"
-editor_options: 
-  chunk_output_type: inline
+title: "Regression modeling with R"
+subtitle: "Setup notebook"
+author: "Karla Lindquist"
+date: "September 30, 2021"
+output: html_notebook
 ---
 
 ### Install and Load Required Packages
@@ -9,7 +11,8 @@ editor_options:
 Next, install and load the packages that we will be using in all sections.
 
 ```{r}
-pkgs <- c("dplyr","ggplot2","jtools","lmtest","naniar","survival","gplots","survminer")
+pkgs <- c("dplyr","ggplot2","jtools","lmtest","naniar","survival","gplots","survminer","ggstance","broom.mixed") 
+## note: some may have issues with installing a few of these packages ... if you have trouble, please feel free to email karla.lindquist@ucsf.edu 
 
 install.packages(pkgs, update = TRUE, ask = FALSE) 
 

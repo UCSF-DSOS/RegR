@@ -1,7 +1,9 @@
 ---
-title: "Cox regression for survival outcomes"
-editor_options: 
-  chunk_output_type: inline
+title: "Regression modeling with R"
+subtitle: "Cox regression notebook"
+author: "Karla Lindquist"
+date: "September 30, 2021"
+output: html_notebook
 ---
 
 First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).

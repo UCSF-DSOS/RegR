@@ -1,7 +1,9 @@
 ---
-title: "Logistic regression for binary outcomes"
-editor_options: 
-  chunk_output_type: inline
+title: "Regression modeling with R"
+subtitle: "Logistic regression notebook"
+author: "Karla Lindquist"
+date: "September 30, 2021"
+output: html_notebook
 ---
 
 First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
@@ -171,6 +173,7 @@ summary(depfit_gen_imp)
 Let's visualize the differences between the model without imputed values (Model 1) vs. with imputed values (Model 2).
 
 ```{r message=FALSE}
+summ(depfit_gen)
 plot_summs(depfit_gen, depfit_gen_imp, scale=TRUE)
 ```
 

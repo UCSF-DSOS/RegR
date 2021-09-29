@@ -1,7 +1,9 @@
 ---
-title: "Linear regression for continuous outcomes"
-editor_options: 
-  chunk_output_type: inline
+title: "Regression modeling with R"
+subtitle: "Linear regression notebook"
+author: "Karla Lindquist"
+date: "September 30, 2021"
+output: html_notebook
 ---
 
 First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
@@ -164,12 +166,16 @@ cor.test(x=fitted(bpfit), y=residuals(bpfit), method="pearson")
 
 Overall this model fits well.
 
-**Coefficient plots**
 
-There are many situations where you have a large multivariable model and a visualization is a better way to summarize the effects. This isn't necessarily one of those cases, but to demonstrate how to do this with a function from the `jtools` package, we'll make a simple plot of the coefficients and 95% confidence intervals.
+**Coefficient plots and model summary with `jtools`**
 
-For more handy tools from `jtools`, see this [vignette](https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#plot_summs_and_plot_coefs)!
+There are many situations where you have a large multivariable model and a visualization is a better way to summarize the effects. This isn't necessarily one of those cases, but to demonstrate how to do this with a function from the `jtools` package, we'll make a simple plot of the coefficients and 95% confidence intervals. And a nice looking table with the results.
+
+For more handy tools from `jtools`, see this [vignette](https://cran.r-project.org/web/packages/jtools/vignettes/summ.html#plot_summs_and_plot_coefs)!  
+
+*Update:* this function has caused some errors for some people, so if you are not able to run this, let me know if you need help troubleshooting. I am adding a couple of lines here to install some packages that may fix the issues for some.  
 
 ```{r message=FALSE}
+summ(bpfit_adj)
 plot_summs(bpfit_adj, scale=TRUE) ## scale mean-centers the predictor values so they are less affected by original scale
 ```
