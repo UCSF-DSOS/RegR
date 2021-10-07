@@ -2,7 +2,7 @@
 title: "Regression modeling with R"
 subtitle: "Cox regression notebook"
 author: "Karla Lindquist"
-date: "September 30, 2021"
+date: "October 7, 2021"
 output: html_notebook
 ---
 
@@ -103,3 +103,9 @@ For more diagnostic tests and options when proportional hazards assumtpions are 
 ```{r message=FALSE}
 plot_summs(cfit2, scale=TRUE)
 ```
+
+
+
+</br>
+
+### KNOWLEDGE CHECK: Model diagnostics  

@@ -2,7 +2,7 @@
 title: "Regression modeling with R"
 subtitle: "Logistic regression notebook"
 author: "Karla Lindquist"
-date: "September 30, 2021"
+date: "October 7, 2021"
 output: html_notebook
 ---
 
@@ -176,4 +176,10 @@ Let's visualize the differences between the model without imputed values (Model 
 summ(depfit_gen)
 plot_summs(depfit_gen, depfit_gen_imp, scale=TRUE)
 ```
+
+
+
+</br>
+
+### KNOWLEDGE CHECK: Multivariable logistic regression  
 

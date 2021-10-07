@@ -2,11 +2,61 @@
 title: "Regression modeling with R"
 subtitle: "Setup notebook"
 author: "Karla Lindquist"
-date: "September 30, 2021"
+date: "October 7, 2021"
 output: html_notebook
 ---
 
-### Install and Load Required Packages
+### Create an RStudio project 
+
+I strongly recommend downloading the complete project from the [CLE page](http://tiny.ucsf.edu/dsiregr) or [GitHub](https://github.com/UCSF-DSI/RegR) so that you don't have to worry about working directories. This is the main benefit of using RStudio projects - wherever you save them, everything will be relative to the .Rproj file.  
+
+If you want to creat an RStudio project from scratch, instructions are as follows:  
+1. Go to the RStudio main menu, select __File -> New Project__.  
+2. Select __New Directory__
+3. Select __Empty Project__
+4. Give the project an informative __Directory Name__ (this will be created for you). Use __Browse__ to choose the location for this directory.   
+_Optional_: check the "Create git repository" box if you know how to use git for version control.
+5. Click __Create Project__ button. This creates a new project directory, as well as a .Rproj file within it. 
+
+Within the project folder that you just created, create the following directories: 
+
+- Data (save hrs_analyze.csv file from the Datasets section of the CLE page here)
+- Notebooks (if using R markdown)
+- Scripts (if creating new project from scratch) 
+- Results (optional)
+
+</br>
+
+### Start an R script
+
+
+You can start a new R scipt using the RStudio drop-down menu that has a little page icon with a green **+** symbol (top left).
+
+_Best practice tip_:  At the top of your script, write comments that indicate:
+
+```{r}
+## Purpose: save commands from Regression Modeling with R class
+## Author: Karla Lindquist (karla.lindquist@ucsf.edu)
+## Updated: October 7, 2021
+```
+
+
+You may also want to pre-define sections in your script. Using the `####` after a comment will create a navigatable menu in RStudio (see bottom of script window).  
+
+```{r}
+## Read data ####
+
+## Liner regression ####
+
+## Logistic regression ####
+
+## Survival analysis ####
+
+```
+
+</br>
+
+### Install and Load Required Packages  
 
 Next, install and load the packages that we will be using in all sections.
 
@@ -23,11 +73,15 @@ for(package in pkgs) {
 
 *Note: this will update packages if they already exist in your system. If asked to restart RStudio, you can do this - just make sure you save things if you have other stuff open.*
 
-### Read data into R
+</br>
+
+### Read data into R  
+
+If you have downloaded the whole R project from the [CLE page](http://tiny.ucsf.edu/dsiregr) or [GitHub](https://github.com/UCSF-DSI/RegR) for this workshop, you should have the data and directories all set to go for reading the dataset. Just double click on the **RegR.Rproj** file, and there will be no need to set your working directory before reading the data below.  
 
 ***HRS variables***
 
-```{r}
+```{r echo=FALSE}
 Variable <- c("id", "female", "age_2014", "depress_dx", "bp_dx", "bp_rx", "bp_sys", "bp_dia",
               "polygen_map", "polygen_dep", "died", "mos_to_death")
 Label <- c("unique patient identifiers (random)", "female (self-reported)", "age in 2014", "depression diagnosis (ever, self-reported)", "high blood pressure diagnosis (ever, self-reported)", "high blood pressure meds (current, self-reported)", "systolic blood pressure (measured)", "diastolic blood pressure (measured)", 
@@ -39,7 +93,7 @@ hrsvars <- as.data.frame(cbind(Variable, Label))
 hrsvars
 ```
 
-We will first read the file called "hrs_analyze.csv" into R (calling this object simply `hrs`).
+We will first read the file called "hrs_analyze.csv" into R (calling this object simply `hrs`). Note: this assumes that you are in your main project directory. If you are not, please set your working didrectory to that.    
 
 ```{r}
 hrs <- read.csv("../Data/hrs_analyze.csv")
@@ -52,3 +106,11 @@ hrs
 str(hrs) ## remember str stands for "structure" in R
 head(hrs) 
 ```
+
+</br>
+
+### KNOWLEDGE CHECK: Read data into R 
+
+
+
+

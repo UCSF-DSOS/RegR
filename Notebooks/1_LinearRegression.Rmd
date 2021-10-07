@@ -2,7 +2,7 @@
 title: "Regression modeling with R"
 subtitle: "Linear regression notebook"
 author: "Karla Lindquist"
-date: "September 30, 2021"
+date: "October 7, 2021"
 output: html_notebook
 ---
 
@@ -15,7 +15,7 @@ library(lmtest)
 library(jtools)
 ```
 
-*Note: this notebook also assumes that you have assigned the `projdir` object (main project directory) and that you have an object called `hrs` that contains the data. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
+*Note: this notebook also assumes that you have assigned the data from hrs_analyze.csv into an object called `hrs`. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
 
 ### Generalized linear models
 
@@ -179,3 +179,10 @@ For more handy tools from `jtools`, see this [vignette](https://cran.r-project.o
 summ(bpfit_adj)
 plot_summs(bpfit_adj, scale=TRUE) ## scale mean-centers the predictor values so they are less affected by original scale
 ```
+
+</br>
+
+### KNOWLEDGE CHECK: Visualizing the regression line on a scatterplot
+
+
+
