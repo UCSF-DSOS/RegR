@@ -1,18 +1,25 @@
-# RegR
+# Regression Modeling with R
 Materials for Regression Modeling With R Workshop. http://tiny.ucsf.edu/dsiregr
 
 Workshop Overview
  
-This is a hands-on workshop that covers how to perform common regression models using the R programming language, and how to visualize the results. It is not an introductory R programming workshop. See prerequisities below.
+This is a 2-part hands-on workshop that covers how to build common regression models using the R programming language, and how to visualize the results. It is not an introductory R programming workshop. See prerequisities below.
  
 Learning Objectives
  
-In this workshop, participants will:
+In Part 1 of this workshop, participants will:
 
-    Learn how to run regression models for:
+    Learn how to build regression models for:
         continuous outcomes
         binary outcomes
+    Learn how to use ggplot2 to visually check assumptions and summarize regression results
+
+
+In Part 2 of this workshop, participants will:
+
+    Learn how to build regression models for:
         survival outcomes
+        continuous outcomes with repeated measures
     Learn how to use ggplot2 to visually check assumptions and summarize regression results
 
  
