@@ -2,15 +2,14 @@
 title: "Regression modeling with R"
 subtitle: "Cox regression notebook"
 author: "Karla Lindquist"
-date: "October 7, 2021"
+date: "March 31, 2022"
 output: html_notebook
 ---
 
 First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
 
 ```{r messages=FALSE}
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(survival)
 library(gplots)
 library(survminer)
@@ -18,6 +17,8 @@ library(jtools)
 ```
 
 *Note: this notebook also assumes that you have assigned the `projdir` object (main project directory) and that you have an object called `hrs` that contains the data. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
+
+------------------------------------------------------------------------
 
 #### Preliminary data checks
 
@@ -54,6 +55,8 @@ sdiff
 
 So the p-value is \<0.01, indicating that females have a significantly longer survival time (because we saw that they have a longer median time above, and the curve shows this too).
 
+------------------------------------------------------------------------
+
 ### Cox proportional hazards regression
 
 Now let's run a Cox regression model to test if survival is different by gender. The Cox regression model is the most common method used for multivariable survival analysis.
@@ -81,7 +84,9 @@ exp(coefficients(cfit1))
 exp(coefficients(cfit2))
 ```
 
-**Model diagnostics**
+------------------------------------------------------------------------
+
+### **Model diagnostics**
 
 Just like with any other type of regression, you should check to see if the assumptions of this model are met. For the Cox model, one of the most important assumptions to test is proportional hazards, meaning that the HRs are assumed to be constant over time.
 
@@ -94,7 +99,7 @@ cfit_ph
 
 If we are using a p\<0.05 criteria, age is in violation. There are ways to deal with this (beyond the scope of this workshop). The global p-value is not significant however, meaning that the model meets the assumption overall. If gender was our main interest then it's probably OK.
 
-For more diagnostic tests and options when proportional hazards assumtpions are not met, this [tutorial](https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html) has more details.
+For more diagnostic tests and options when proportional hazards assumpions are not met, this [tutorial](https://bookdown.org/sestelo/sa_financial/how-to-evaluate-the-ph-assumption.html) has more details.
 
 **Visualize model results**
 
@@ -104,8 +109,6 @@ For more diagnostic tests and options when proportional hazards assumtpions are 
 plot_summs(cfit2, scale=TRUE)
 ```
 
+------------------------------------------------------------------------
 
-
-</br>
-
-### KNOWLEDGE CHECK: Model diagnostics  
+### KNOWLEDGE CHECK: Model diagnostics
