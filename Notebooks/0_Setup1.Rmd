@@ -1,0 +1,107 @@
+---
+title: "Regression modeling with R Part 1"
+subtitle: "Setup notebook"
+author: "Karla Lindquist"
+date: "March 24, 2022"
+output: html_notebook
+---
+
+------------------------------------------------------------------------
+
+### Create an RStudio project
+
+I recommend downloading the complete project from [GitHub](https://github.com/UCSF-DSI/RegR) so that you don't have to worry about working directories. This is the main benefit of using RStudio projects - wherever you save them, everything will be relative to the .Rproj file.
+
+If you want to creat an RStudio project from scratch, instructions are as follows:\
+1. Go to the RStudio main menu, select **File -\> New Project**.\
+2. Select **New Directory** 3. Select **Empty Project** 4. Give the project an informative **Directory Name** (this will be created for you). Use **Browse** to choose the location for this directory.\
+*Optional*: check the "Create git repository" box if you know how to use git for version control. 5. Click **Create Project** button. This creates a new project directory, as well as a .Rproj file within it.
+
+Within the project folder that you just created, create the following directories:
+
+-   Data (save hrs_analyze.csv file from the Datasets section of the CLE page here)
+-   Notebooks (if using R markdown)
+-   Scripts (if creating new project from scratch)
+-   Results (optional)
+
+------------------------------------------------------------------------
+
+### Start an R script
+
+You can start a new R scipt using the RStudio drop-down menu that has a little page icon with a green **+** symbol (top left).
+
+*Best practice tip*: At the top of your script, write comments that indicate:
+
+```{r}
+## Purpose: save commands from Regression Modeling with R Part 1
+## Author: Karla Lindquist (karla.lindquist@ucsf.edu)
+## Updated: March 24, 2022
+```
+
+You may also want to pre-define sections in your script. Using the `####` after a comment will create a navigable menu in RStudio (see bottom of script window).
+
+```{r}
+## Read data ####
+
+## Liner regression ####
+
+## Logistic regression ####
+
+```
+
+------------------------------------------------------------------------
+
+### Install and Load Required Packages
+
+Next, install and load the packages that we will be using in all sections.
+
+```{r}
+pkgs <- c("tidyverse","jtools","lmtest","naniar") 
+
+install.packages(pkgs, update = TRUE, ask = FALSE) 
+
+for(package in pkgs) {
+  do.call("library", list(package))
+}
+```
+
+*Note: this will update packages if they already exist in your system. If asked to restart RStudio, you can do this - just make sure you save things if you have other stuff open.*
+
+------------------------------------------------------------------------
+
+### Read data into R
+
+If you have downloaded the whole R project from [GitHub](https://github.com/UCSF-DSI/RegR) for this workshop, you should have the data and directories all set to go for reading the dataset. Just double click on the **RegR.Rproj** file, and there will be no need to set your working directory before reading the data below.
+
+***HRS variables***
+
+```{r echo=FALSE}
+Variable <- c("id", "female", "age_2014", "depress_dx", "bp_dx", "bp_rx", "bp_sys", "bp_dia",
+              "polygen_map", "polygen_dep", "died", "mos_to_death")
+Label <- c("unique patient identifiers (random)", "female (self-reported)", "age in 2014", "depression diagnosis (ever, self-reported)", "high blood pressure diagnosis (ever, self-reported)", "high blood pressure meds (current, self-reported)", "systolic blood pressure (measured)", "diastolic blood pressure (measured)", 
+           "polygenic marker score ~ mean arterial pressure", "polygenic marker score ~ depression",
+           "died (or censored)", "months to death (or censoring)")
+
+hrsvars <- as.data.frame(cbind(Variable, Label))
+
+hrsvars
+```
+
+We will first read the file called "hrs_analyze.csv" into R (calling this object simply `hrs`). Note: this assumes that you are in your main project directory. If you are not, please set your working directory to that.
+
+```{r}
+hrs <- read.csv("../Data/hrs_analyze.csv")
+```
+
+------------------------------------------------------------------------
+
+### Inspect the data
+
+```{r}
+glimpse(hrs) ## remember glimpse is similar to the str() or "structure" function in R
+head(hrs) 
+```
+
+------------------------------------------------------------------------
+
+#### KNOWLEDGE CHECK: Read data into R
