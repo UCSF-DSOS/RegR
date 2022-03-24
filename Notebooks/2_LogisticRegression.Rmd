@@ -2,15 +2,14 @@
 title: "Regression modeling with R"
 subtitle: "Logistic regression notebook"
 author: "Karla Lindquist"
-date: "October 7, 2021"
+date: "March 24, 2022"
 output: html_notebook
 ---
 
 First, let's make sure packages for this notebook are loaded (if you already ran the Setup notebook they should be).
 
 ```{r messages=FALSE}
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(lmtest)
 library(naniar)
 library(jtools)
@@ -18,7 +17,9 @@ library(jtools)
 
 *Note: this notebook also assumes that you have assigned the `projdir` object (main project directory) and that you have an object called `hrs` that contains the data. See the Setup notebook if you need to reassign these or if you have errors from loading the packages.*
 
-#### Preliminary data checks
+------------------------------------------------------------------------
+
+### Preliminary data checks
 
 Say we want to study the relationship between having been diagnosed with high blood pressure (`bp_dx`) and having been diagnosed with depression (`depress_dx`). We could use a chi-square test to get a p-value for this comparison.
 
@@ -58,6 +59,8 @@ rr_bp
 
 So the risk of depression is also higher in those with a high BP but these are not exactly the same.
 
+------------------------------------------------------------------------
+
 ### Simple logistic regression
 
 As mentioned in the previous section, we can use `glm()` for many different types of regression models. Here, since we want logistic regression because we have a binary outcome, we will use the Binomial family (specified using the family=binomial option).
@@ -79,6 +82,8 @@ exp(confint(depfit))
 ```
 
 So the OR is consisent with what we calculated manually above, and the p-value is pretty consistent with the chi-square test too.
+
+------------------------------------------------------------------------
 
 ### Multivariable logistic regression
 
@@ -110,9 +115,21 @@ lrtest(depfit, depfit_adj1)
 
 So like with the linear regression, we see that these demographic variables collectively improve the model fit. They should be kept in the model.
 
+------------------------------------------------------------------------
+
+### Model Diagnostics
+
+Like with linear regression, are several approaches to checking model assumptions (e.g. there should be a linear relationship between continuous predictor variables and the logit of the outcome), checking for influential values, multicollinearity, etc. Some of these methods are covered [here](http://www.sthda.com/english/articles/36-classification-methods-essentials/148-logistic-regression-assumptions-and-diagnostics-in-r/) and can be performed using other R packages such as `DescTools`, `performance` , `LogisticDx` and others.
+
+We will skip doing these for now although they are important to perform. Instead we will focus on our main problem at hand which is the large number of missing values in our final model.
+
+------------------------------------------------------------------------
+
 **Imputing missing values**
 
-Let's see what happens when we adjust for the polygenetic score for depression. First let's summarize this continuous variable.
+There are times when you want to fill in (impute) missing values in order to avoid dropping a lot of observations (and reducing statistical power). Note that missing values can also be informative, meaning that they may reflect some bias in your data set. This is a different issue and is quite a bit more complicated and cannot be solved by imputing. Can you think of situations where this might be the case, for example in our case with the missing polygenetic scores?
+
+As an example, let's see what happens when we adjust for the polygenetic score for depression. First let's summarize this continuous variable.
 
 ```{r}
 summary(hrs$polygen_dep)
@@ -166,7 +183,7 @@ summary(depfit_gen)
 summary(depfit_gen_imp)
 ```
 
-**Visualize non-imputed vs. imputed**
+**Visualize non-imputed vs. imputed models**
 
 *Do you remember how to plot the coefficients using the `jtools` package?*
 
@@ -174,12 +191,9 @@ Let's visualize the differences between the model without imputed values (Model 
 
 ```{r message=FALSE}
 summ(depfit_gen)
-plot_summs(depfit_gen, depfit_gen_imp, scale=TRUE)
+plot_summs(depfit_gen, depfit_gen_imp, scale=TRUE, model.names=c("No imputation","Imputation"))
 ```
 
+------------------------------------------------------------------------
 
-
-</br>
-
-### KNOWLEDGE CHECK: Multivariable logistic regression  
-
+#### KNOWLEDGE CHECK: Multivariable logistic regression
