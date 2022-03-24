@@ -12,15 +12,14 @@ In Part 1 of this workshop, participants will:
     Learn how to build regression models for:
         continuous outcomes
         binary outcomes
-    Learn how to use ggplot2 to visually check assumptions and summarize regression results
+    Learn how to visually check assumptions and summarize regression results
 
 
 In Part 2 of this workshop, participants will:
 
     Learn how to build regression models for:
         survival outcomes
-        continuous outcomes with repeated measures
-    Learn how to use ggplot2 to visually check assumptions and summarize regression results
+    Learn how to visually check assumptions and summarize regression results
 
  
 Prerequisites
