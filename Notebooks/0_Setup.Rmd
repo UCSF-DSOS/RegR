@@ -1,47 +1,44 @@
 ---
-title: "Regression modeling with R"
+title: "Regression modeling with R Part 1"
 subtitle: "Setup notebook"
 author: "Karla Lindquist"
-date: "October 7, 2021"
+date: "March 24, 2022"
 output: html_notebook
 ---
 
-### Create an RStudio project 
+------------------------------------------------------------------------
 
-I strongly recommend downloading the complete project from the [CLE page](http://tiny.ucsf.edu/dsiregr) or [GitHub](https://github.com/UCSF-DSI/RegR) so that you don't have to worry about working directories. This is the main benefit of using RStudio projects - wherever you save them, everything will be relative to the .Rproj file.  
+### Create an RStudio project
 
-If you want to creat an RStudio project from scratch, instructions are as follows:  
-1. Go to the RStudio main menu, select __File -> New Project__.  
-2. Select __New Directory__
-3. Select __Empty Project__
-4. Give the project an informative __Directory Name__ (this will be created for you). Use __Browse__ to choose the location for this directory.   
-_Optional_: check the "Create git repository" box if you know how to use git for version control.
-5. Click __Create Project__ button. This creates a new project directory, as well as a .Rproj file within it. 
+I recommend downloading the complete project from [GitHub](https://github.com/UCSF-DSI/RegR) so that you don't have to worry about working directories. This is the main benefit of using RStudio projects - wherever you save them, everything will be relative to the .Rproj file.
 
-Within the project folder that you just created, create the following directories: 
+If you want to creat an RStudio project from scratch, instructions are as follows:\
+1. Go to the RStudio main menu, select **File -\> New Project**.\
+2. Select **New Directory** 3. Select **Empty Project** 4. Give the project an informative **Directory Name** (this will be created for you). Use **Browse** to choose the location for this directory.\
+*Optional*: check the "Create git repository" box if you know how to use git for version control. 5. Click **Create Project** button. This creates a new project directory, as well as a .Rproj file within it.
 
-- Data (save hrs_analyze.csv file from the Datasets section of the CLE page here)
-- Notebooks (if using R markdown)
-- Scripts (if creating new project from scratch) 
-- Results (optional)
+Within the project folder that you just created, create the following directories:
 
-</br>
+-   Data (save hrs_analyze.csv file from the Datasets section of the CLE page here)
+-   Notebooks (if using R markdown)
+-   Scripts (if creating new project from scratch)
+-   Results (optional)
+
+------------------------------------------------------------------------
 
 ### Start an R script
 
-
 You can start a new R scipt using the RStudio drop-down menu that has a little page icon with a green **+** symbol (top left).
 
-_Best practice tip_:  At the top of your script, write comments that indicate:
+*Best practice tip*: At the top of your script, write comments that indicate:
 
 ```{r}
-## Purpose: save commands from Regression Modeling with R class
+## Purpose: save commands from Regression Modeling with R Part 1
 ## Author: Karla Lindquist (karla.lindquist@ucsf.edu)
-## Updated: October 7, 2021
+## Updated: March 24, 2022
 ```
 
-
-You may also want to pre-define sections in your script. Using the `####` after a comment will create a navigatable menu in RStudio (see bottom of script window).  
+You may also want to pre-define sections in your script. Using the `####` after a comment will create a navigable menu in RStudio (see bottom of script window).
 
 ```{r}
 ## Read data ####
@@ -50,19 +47,16 @@ You may also want to pre-define sections in your script. Using the `####` after 
 
 ## Logistic regression ####
 
-## Survival analysis ####
-
 ```
 
-</br>
+------------------------------------------------------------------------
 
-### Install and Load Required Packages  
+### Install and Load Required Packages
 
 Next, install and load the packages that we will be using in all sections.
 
 ```{r}
-pkgs <- c("dplyr","ggplot2","jtools","lmtest","naniar","survival","gplots","survminer","ggstance","broom.mixed") 
-## note: some may have issues with installing a few of these packages ... if you have trouble, please feel free to email karla.lindquist@ucsf.edu 
+pkgs <- c("tidyverse","jtools","lmtest","naniar") 
 
 install.packages(pkgs, update = TRUE, ask = FALSE) 
 
@@ -73,11 +67,11 @@ for(package in pkgs) {
 
 *Note: this will update packages if they already exist in your system. If asked to restart RStudio, you can do this - just make sure you save things if you have other stuff open.*
 
-</br>
+------------------------------------------------------------------------
 
-### Read data into R  
+### Read data into R
 
-If you have downloaded the whole R project from the [CLE page](http://tiny.ucsf.edu/dsiregr) or [GitHub](https://github.com/UCSF-DSI/RegR) for this workshop, you should have the data and directories all set to go for reading the dataset. Just double click on the **RegR.Rproj** file, and there will be no need to set your working directory before reading the data below.  
+If you have downloaded the whole R project from [GitHub](https://github.com/UCSF-DSI/RegR) for this workshop, you should have the data and directories all set to go for reading the dataset. Just double click on the **RegR.Rproj** file, and there will be no need to set your working directory before reading the data below.
 
 ***HRS variables***
 
@@ -93,24 +87,21 @@ hrsvars <- as.data.frame(cbind(Variable, Label))
 hrsvars
 ```
 
-We will first read the file called "hrs_analyze.csv" into R (calling this object simply `hrs`). Note: this assumes that you are in your main project directory. If you are not, please set your working didrectory to that.    
+We will first read the file called "hrs_analyze.csv" into R (calling this object simply `hrs`). Note: this assumes that you are in your main project directory. If you are not, please set your working directory to that.
 
 ```{r}
 hrs <- read.csv("../Data/hrs_analyze.csv")
-hrs
 ```
+
+------------------------------------------------------------------------
 
 ### Inspect the data
 
 ```{r}
-str(hrs) ## remember str stands for "structure" in R
+glimpse(hrs) ## remember glimpse is similar to the str() or "structure" function in R
 head(hrs) 
 ```
 
-</br>
+------------------------------------------------------------------------
 
-### KNOWLEDGE CHECK: Read data into R 
-
-
-
-
+#### KNOWLEDGE CHECK: Read data into R
