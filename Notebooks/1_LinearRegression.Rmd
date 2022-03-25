@@ -34,7 +34,7 @@ Notice the syntax uses the formula style of input: `y ~ x`. And the default is t
 
 One of the assumptions of linear regression is that your outcome (y variable) is continuous and normally distributed. There are several ways to test this assumption. We will use the visual method of using `ggplot2` to create a Q-Q plot on the variable we intend to model as the outcome, systolic blood pressure `bp_sys`.
 
-The `ggplot2` package is a very powerful package for creating publication-quality graphics. We won't cover it fully in this course (stay tuned for a separate workshop on R visualizations!). Here is a great resource for inspiration and concise code tips: [ggplot2 cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf).
+The `ggplot2` package is a very powerful package for creating publication-quality graphics. We won't cover it fully in this course (see [**https://tiny.ucsf.edu/dsiggplot2r**](https://tiny.ucsf.edu/dsiggplot2r) for my separate ggplot2 workshop materials). Here is a great resource for inspiration and concise code tips: [ggplot2 cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf).
 
 Take a look at the first example of a `ggplot()` call under Basics section of the cheatsheet:\
 ggplot(data = mpg, aes(x = cty, y = hwy))
@@ -94,7 +94,11 @@ Let's test for the association between systolic and diastolic blood pressure (BP
 glm(bp_sys ~ bp_dia, data=hrs)
 ```
 
-There are also functions that can be applied to the model object to easily extract confidence intervals for the coefficients, fitted values, residuals, and other information. Let's look at an overall model summary and get coefficient confidence intervals.
+For a refresher on what the intercept and predictor (here bp_dia) coefficients represent in regression models, here is simplistic diagram:
+
+![](images/Reg.png){width="222"}
+
+If you assign the model results to an object, you can use various functions to easily extract confidence intervals for the coefficients, fitted values, residuals, and other information. Let's look at an overall model summary and get coefficient confidence intervals.
 
 ```{r}
 bpfit <- glm(bp_sys ~ bp_dia, data=hrs)
@@ -148,7 +152,9 @@ We conclude that the second model with female and age fits the data better than 
 
 #### **Model diagnostics**
 
-A commonly used diagnostic check to determine if the model fits the data well is to look at the fitted values and residuals. The mean of the fitted values should be similar to the actual values, and the mean of the residuals should be around zero.
+A commonly used diagnostic check to determine if the model fits the data well is to look at the fitted values and residuals. The mean of the fitted values should be similar to the actual values, and the mean of the residuals should be zero.
+
+Model diagnostics are essential to perform and we do not have time to cover all of the tests that should be performed in this workshop, including checking for influential values, multicollinearity, etc. For a more complete coverage of diagnostic tests with R, see [here](https://book.stat420.org/model-diagnostics.html).
 
 For now we will just use the original model from above called `bpfit` (with `bp_dia` as the only predictor). The same can be done for the adjusted model.
 
